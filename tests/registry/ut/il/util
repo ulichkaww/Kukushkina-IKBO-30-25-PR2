@@ -1,0 +1,4 @@
+{"name":"util","vers":"0.2.0","deps":[],"cksum":"c173067df2d5d1260f18e674d8502d3ef80f32ed77e04b5cc2a9bff23abadedc","features":{},"yanked":false}
+{"name":"util","vers":"0.2.1","deps":[],"cksum":"ca0d8067c70f16a164cc9147111b7a8dc1512fc26c1d168639ffda8495bb42e5","features":{},"yanked":false}
+{"name":"util","vers":"0.2.9","deps":[{"name":"core-lib","req":"^0.1","features":[],"optional":false,"default_features":true,"target":null,"kind":"normal"},{"name":"libx","req":"^1.0","features":[],"optional":false,"default_features":true,"target":null,"kind":"normal"}],"cksum":"a1084c75e9302e54cef40c41761081af63e0f99b60a392b96d07a22e9c393825","features":{},"yanked":false}
+{"name":"util","vers":"0.3.0","deps":[{"name":"core-lib","req":"^0.2","features":[],"optional":false,"default_features":true,"target":null,"kind":"normal"}],"cksum":"3362773df50e33ea8f13a5c635b0b334c74a0824a2fdd16ff525acd4face23bc","features":{},"yanked":false}

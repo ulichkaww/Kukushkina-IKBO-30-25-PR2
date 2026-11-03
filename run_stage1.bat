@@ -5,7 +5,7 @@ cd /d "%~dp0"
 echo === Параметры из корректных конфигураций
 python src\depgraph.py --config configs\test_tree.yaml
 echo.
-python src\depgraph.py --config configs\serde.yaml
+python src\depgraph.py --config configs\real_regex.yaml
 
 echo.
 echo === Ошибка: конфигурационный файл не найден

@@ -1,0 +1,6 @@
+# Реальный crates.io (нужен доступ в интернет)
+package: regex
+repository: https://index.crates.io
+test_mode: false
+version: 1.10.4
+filter: ""

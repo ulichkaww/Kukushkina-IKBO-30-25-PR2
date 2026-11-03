@@ -1,0 +1,1 @@
+{"name":"extra","vers":"1.0.0","deps":[{"name":"core-lib","req":"^0.1","features":[],"optional":false,"default_features":true,"target":null,"kind":"normal"}],"cksum":"b527e545d69c870447406279fc5c1ccd5aa2402d88e30c344a36ae8e2d401e3c","features":{},"yanked":false}

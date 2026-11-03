@@ -1,0 +1,6 @@
+# Реальный crates.io (нужен доступ в интернет)
+package: clap
+repository: https://index.crates.io
+test_mode: false
+version: 4.5.4
+filter: ""

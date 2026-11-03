@@ -1,0 +1,5 @@
+package: app
+repository: http://localhost:8000
+test_mode: false
+version: 0.9.0
+filter: ""

@@ -5,13 +5,12 @@ import re
 from dataclasses import dataclass
 from urllib.parse import urlparse
 
+import semver
 from errors import ConfigError
 from yaml_config import load_yaml
 
 CONFIG_KEYS = ("package", "repository", "test_mode", "version", "filter")
 NAME_PATTERN = re.compile(r"[A-Za-z_][A-Za-z0-9_-]*")
-VERSION_PATTERN = re.compile(
-    r"\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?")
 MAX_NAME_LENGTH = 64
 URL_SCHEMES = ("http", "https")
 
@@ -72,7 +71,7 @@ def check_repository(value, test_mode):
 def check_version(value):
     """Версия пакета в формате MAJOR.MINOR.PATCH."""
     text = require_string("version", value)
-    if not VERSION_PATTERN.fullmatch(text):
+    if not semver.is_valid_version(text):
         raise ConfigError(
             f"version: '{text}' не похоже на версию вида 1.2.3")
     return text

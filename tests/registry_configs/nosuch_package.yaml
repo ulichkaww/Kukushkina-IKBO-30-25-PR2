@@ -1,0 +1,5 @@
+package: nosuch
+repository: http://localhost:8000
+test_mode: false
+version: 1.0.0
+filter: ""

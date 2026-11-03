@@ -1,0 +1,6 @@
+# Учебный реестр из tests/registry (запустить: run_local_registry.bat)
+package: app
+repository: http://localhost:8000
+test_mode: false
+version: 1.0.0
+filter: ""

@@ -107,7 +107,8 @@ class CliTest(unittest.TestCase):
         cwd = os.getcwd()
         os.chdir(helpers.ROOT)
         try:
-            code, out, _ = helpers.run_main(depgraph.main, ["--config", path])
+            code, out, _ = helpers.run_main(
+                depgraph.main, ["--config", path, "--action", "config"])
         finally:
             os.chdir(cwd)
         self.assertEqual(code, depgraph.EXIT_OK)

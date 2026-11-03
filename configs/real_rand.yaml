@@ -1,0 +1,6 @@
+# Реальный crates.io (нужен доступ в интернет)
+package: rand
+repository: https://index.crates.io
+test_mode: false
+version: 0.8.5
+filter: ""
