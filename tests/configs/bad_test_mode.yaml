@@ -1,0 +1,5 @@
+package: A
+repository: tests/repos/tree.txt
+test_mode: maybe
+version: 1.0.0
+filter: ""

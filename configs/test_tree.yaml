@@ -1,0 +1,6 @@
+# Тестовый режим: repository — путь к файлу с описанием графа
+package: A
+repository: tests/repos/tree.txt
+test_mode: true
+version: 1.0.0
+filter: ""

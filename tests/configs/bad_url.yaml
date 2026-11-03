@@ -1,0 +1,5 @@
+package: serde
+repository: ftp://example.com/index
+test_mode: false
+version: 1.0.200
+filter: ""

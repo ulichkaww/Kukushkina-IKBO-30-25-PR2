@@ -1,0 +1,5 @@
+package: serde
+repository: index.crates.io
+test_mode: false
+version: 1.0.200
+filter: ""

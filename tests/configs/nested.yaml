@@ -1,0 +1,3 @@
+package: serde
+repository:
+  url: https://index.crates.io

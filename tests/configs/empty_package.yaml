@@ -1,0 +1,5 @@
+package:
+repository: https://index.crates.io
+test_mode: false
+version: 1.0.0
+filter: ""
