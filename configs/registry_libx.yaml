@@ -1,0 +1,6 @@
+# Учебный реестр tests/registry (запуск через tests/with_registry.py)
+package: libx
+repository: http://localhost:8000
+test_mode: false
+version: 1.2.0
+filter: ""

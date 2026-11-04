@@ -4,6 +4,8 @@ import argparse
 import sys
 
 import graph as graph_module
+import mermaid
+import render
 import reverse
 import settings as settings_module
 from cargo_index import CargoRepository
@@ -13,7 +15,7 @@ from file_repo import FileRepository
 EXIT_OK = 0
 EXIT_ERROR = 2
 DEFAULT_CONFIG = "config.yaml"
-ACTIONS = ("config", "direct", "graph", "reverse")
+ACTIONS = ("config", "direct", "graph", "reverse", "mermaid", "image")
 DEFAULT_ACTION = "graph"
 
 
@@ -28,8 +30,18 @@ def parse_args(argv):
     parser.add_argument(
         "--action", choices=ACTIONS, default=DEFAULT_ACTION,
         help="config — параметры, direct — прямые зависимости, graph — граф "
-             "с транзитивными, reverse — обратные зависимости "
+             "с транзитивными, reverse — обратные зависимости, mermaid — "
+             "текст диаграммы, image — изображение графа "
              f"(по умолчанию {DEFAULT_ACTION})")
+    parser.add_argument(
+        "--output", help="файл изображения (по умолчанию output/ПАКЕТ.png)")
+    parser.add_argument(
+        "--renderer", choices=render.RENDERERS,
+        default=render.DEFAULT_RENDERER,
+        help="ink — сервис mermaid.ink, mmdc — локальная утилита")
+    parser.add_argument(
+        "--no-show", action="store_true",
+        help="не открывать изображение после сохранения")
     return parser.parse_args(argv)
 
 
@@ -66,6 +78,28 @@ def show_reverse(settings, repository):
     print("\n".join(reverse.report_lines(result, settings.filter)))
 
 
+def build(settings, repository):
+    """Построить граф зависимостей для заданных параметров."""
+    root = repository.root_node(settings.package, settings.version)
+    return graph_module.build_graph(repository, root, settings.filter)
+
+
+def show_mermaid(settings, repository):
+    """Вывести текст диаграммы Mermaid."""
+    print(mermaid.mermaid_text(build(settings, repository)), end="")
+
+
+def show_image(args, settings, repository):
+    """Сохранить диаграмму, получить изображение и показать его."""
+    text = mermaid.mermaid_text(build(settings, repository))
+    print(text, end="")
+    path = args.output or render.default_paths(settings.package)
+    image = render.render_image(text, path, args.renderer)
+    print(f"Изображение графа: {image}")
+    if not args.no_show:
+        render.show_image(image)
+
+
 def run(args):
     """Выполнить выбранное действие."""
     settings = settings_module.load_settings(args.config)
@@ -73,8 +107,11 @@ def run(args):
         print("\n".join(settings_module.describe(settings)))
         return
     repository = make_repository(settings)
+    if args.action == "image":
+        show_image(args, settings, repository)
+        return
     actions = {"direct": show_direct, "graph": show_graph,
-               "reverse": show_reverse}
+               "reverse": show_reverse, "mermaid": show_mermaid}
     actions[args.action](settings, repository)
 
 

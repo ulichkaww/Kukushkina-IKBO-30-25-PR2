@@ -4,6 +4,38 @@
 Вариант №16. Инструмент строит граф зависимостей пакетов Rust (Cargo).
 Язык — Python 3.10+, сторонние библиотеки не используются.
 
+## Возможности и структура
+
+Запуск: `python src\depgraph.py --config КОНФИГ.yaml [--action ДЕЙСТВИЕ]`.
+
+| `--action` | Что делает |
+| --- | --- |
+| `config` | печатает параметры из конфигурации (ключ: значение) |
+| `direct` | прямые зависимости заданной версии пакета |
+| `graph` (по умолчанию) | граф зависимостей с транзитивными (DFS, циклы, фильтр) |
+| `reverse` | пакеты, которые зависят от заданного (тестовый режим) |
+| `mermaid` | граф на языке Mermaid |
+| `image` | то же + изображение (сохраняется и открывается) |
+
+```text
+src/
+  depgraph.py        точка входа, разбор параметров, действия
+  settings.py        проверка параметров конфигурации
+  yaml_config.py     чтение YAML (подмножество, без библиотек)
+  cargo_index.py     репозиторий Cargo (разреженный индекс), версии
+  cargo_features.py  features и необязательные зависимости
+  semver.py          версии и требования ^, ~, =, >=, *
+  file_repo.py       тестовый репозиторий (файл с буквами)
+  graph.py           граф: DFS с рекурсией, фильтр, циклы, дерево
+  reverse.py         обратные зависимости
+  mermaid.py         текст диаграммы Mermaid
+  render.py          изображение (mermaid.ink или mmdc)
+  errors.py          ошибки приложения
+tests/               unit-тесты, тестовые репозитории, учебный реестр
+configs/             примеры конфигураций
+run*.bat             скрипты запуска и проверки каждого этапа
+```
+
 ## Этап 1 — конфигурация
 
 Параметры задаются YAML-файлом (`--config`, по умолчанию `config.yaml`):
@@ -173,3 +205,155 @@ E
 Примеры: `configs/reverse_*.yaml` (дерево, ромб, цикл, зависимость от себя,
 фильтр, большой граф, пакет без потребителей), ошибки —
 `tests/reverse_configs`. Проверка: `run_stage4.bat`.
+
+## Этап 5 — визуализация
+
+Действия:
+
+| Команда | Что делает |
+| --- | --- |
+| `--action mermaid` | печатает граф на языке Mermaid |
+| `--action image` | печатает Mermaid, сохраняет `output/ПАКЕТ.mmd` и `.png`, открывает изображение |
+
+Дополнительно: `--output ФАЙЛ.png` (куда сохранить), `--no-show` (не
+открывать), `--renderer ink|mmdc`. По умолчанию изображение получает
+сервис [mermaid.ink](https://mermaid.ink) (нужен интернет, текст диаграммы
+передаётся в адресе). `--renderer mmdc` использует локальную утилиту Mermaid CLI
+(`npm i -g @mermaid-js/mermaid-cli`), интернет не нужен. Если изображение
+получить не удалось, текст диаграммы всё равно сохранён в `.mmd` (его
+можно открыть на https://mermaid.live). Каталог `output/` в `.gitignore`:
+изображения в репозиторий не добавляются.
+
+На диаграмме корень выделен цветом, пакеты с общими зависимостями показаны
+одним узлом, ребро, замыкающее цикл, нарисовано пунктиром. Модули:
+`mermaid.py` (текст), `render.py` (изображение).
+
+### Примеры для трёх пакетов (учебный реестр)
+
+`python tests\with_registry.py -- --config configs\registry_app.yaml --action mermaid`
+(так же `registry_util.yaml`, `registry_libx.yaml`). GitHub рисует диаграммы
+прямо в README.
+
+**app 1.0.0**
+
+```mermaid
+graph TD
+    n0["app 1.0.0"]
+    n1["libx 1.2.0"]
+    n2["core-lib 0.1.7"]
+    n3["util 0.2.9"]
+    n4["opt-speed 2.1.0"]
+    n5["tiny-json 0.5.3"]
+    n0 --> n1
+    n0 --> n3
+    n0 --> n4
+    n0 --> n5
+    n1 --> n2
+    n3 --> n2
+    n3 --> n1
+    n4 --> n2
+    classDef root fill:#ffe9a8,stroke:#b58900,stroke-width:2px
+    class n0 root
+```
+
+**util 0.2.9**
+
+```mermaid
+graph TD
+    n0["util 0.2.9"]
+    n1["core-lib 0.1.7"]
+    n2["libx 1.2.0"]
+    n0 --> n1
+    n0 --> n2
+    n2 --> n1
+    classDef root fill:#ffe9a8,stroke:#b58900,stroke-width:2px
+    class n0 root
+```
+
+**libx 1.2.0**
+
+```mermaid
+graph TD
+    n0["libx 1.2.0"]
+    n1["core-lib 0.1.7"]
+    n0 --> n1
+    classDef root fill:#ffe9a8,stroke:#b58900,stroke-width:2px
+    class n0 root
+```
+
+Тестовый граф с циклом (`configs/test_cycle.yaml`):
+
+```mermaid
+graph TD
+    n0["A"]
+    n1["B"]
+    n2["C"]
+    n3["D"]
+    n0 --> n1
+    n1 --> n2
+    n2 -.-> n0
+    n2 --> n3
+    classDef root fill:#ffe9a8,stroke:#b58900,stroke-width:2px
+    class n0 root
+```
+
+Для реальных пакетов: `configs/real_regex.yaml`, `real_rand.yaml`,
+`real_clap.yaml` (нужен интернет).
+
+### Сравнение с `cargo tree`
+
+Штатный инструмент визуализации Cargo — `cargo tree`. Чтобы сравнить на
+одних и тех же данных, `tests/cargo_compare.py` собирает из `tests/registry`
+настоящий реестр Cargo (архивы `.crate` создаются во временной папке),
+запускает `cargo tree` и depgraph. Результат для `app 1.0.0`
+(`cargo tree -e normal`, версия cargo 1.97):
+
+```text
+depgraph                          cargo tree -e normal
+app 1.0.0                         app v1.0.0
+├── libx 1.2.0                    ├── libx v1.2.0
+│   └── core-lib 0.1.7            │   └── core-lib v0.1.7
+├── util 0.2.9                    ├── opt-speed v2.1.0
+│   ├── core-lib 0.1.7 (*)        │   └── core-lib v0.1.7
+│   └── libx 1.2.0 (*)            ├── tiny-json v0.5.3
+├── opt-speed 2.1.0               └── util v0.2.9
+│   └── core-lib 0.1.7 (*)            ├── core-lib v0.1.7
+└── tiny-json 0.5.3                   └── libx v1.2.0 (*)
+```
+
+Состав пакетов и выбранные версии совпадают: `libx 1.2.0` (не отозванная
+`1.2.5`, не пред-релиз `1.3.0-beta.1`, не `2.0.0`), `core-lib 0.1.7`,
+`util 0.2.9`, переименованная зависимость `json` -> `tiny-json`,
+`opt-speed` (включена feature `default`). Не попали в вывод ни там, ни там:
+`extra` (feature `full` не включена) и `testing` (dev-зависимость).
+
+Расхождения и их причины:
+
+1. **Порядок.** `cargo tree` сортирует зависимости по имени, depgraph
+   сохраняет порядок индекса (порядок объявления). Граф тот же.
+2. **Пометка `(*)`.** Cargo ставит её только у повторяющихся пакетов, у
+   которых есть собственные зависимости, depgraph — у любого повтора. Из-за
+   этого `core-lib` под `util` помечен `(*)` у depgraph.
+3. **Build-зависимости.** По умолчанию `cargo tree` дополнительно выводит
+   раздел `[build-dependencies]` (`builder v1.0.0`), depgraph учитывает только
+   обычные (`normal`) зависимости, поэтому `builder` в графе нет.
+4. **Платформенные зависимости.** `winapi` (`cfg(windows)`) `cargo tree`
+   показывает только для нужной платформы (на Linux — при `--target all`),
+   depgraph платформенные зависимости не учитывает совсем.
+5. **Формат строки.** У cargo префикс `v` и пометка источника
+   (`registry local`), у depgraph — `имя версия`.
+
+Причины расхождений: depgraph намеренно упрощён (по заданию нельзя
+использовать готовые средства получения зависимостей), а Cargo считает
+зависимости для конкретной сборки (платформа, features, виды зависимостей,
+единый для всего дерева выбор версий).
+
+Повторить сравнение: `python tests\cargo_compare.py app 1.0.0` (нужен
+установленный cargo). Для реальных пакетов: `cargo tree -p regex@1.10.6 -e
+normal` в проекте с зависимостью `regex`, и `python src\depgraph.py --config
+configs\real_regex.yaml`. Реальный crates.io в этой среде недоступен, поэтому
+сравнение выше выполнено на учебном реестре; для настоящих пакетов
+расхождения будут из-за тех же причин (особенно features и платформенных
+зависимостей).
+
+Проверка: `run_stage5.bat`, `python -m unittest discover -s tests`.

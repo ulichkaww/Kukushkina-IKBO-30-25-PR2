@@ -1,0 +1,6 @@
+# Учебный реестр tests/registry (запуск через tests/with_registry.py)
+package: app
+repository: http://localhost:8000
+test_mode: false
+version: 1.0.0
+filter: ""
