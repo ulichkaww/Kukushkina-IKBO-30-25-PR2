@@ -1,0 +1,6 @@
+# Тестовый режим: файл tests/repos/big.txt
+package: A
+repository: tests/repos/big.txt
+test_mode: true
+version: 1.0.0
+filter: ""

@@ -9,3 +9,4 @@ dist/
 *.egg-info/
 *.log
 tests/scripts/tmp_*.txt
+tests/tmp_*.yaml

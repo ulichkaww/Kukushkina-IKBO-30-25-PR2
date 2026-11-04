@@ -127,18 +127,10 @@ class CliTest(unittest.TestCase):
                 file.write(f"package: app\nrepository: {url}\n"
                            "test_mode: false\nversion: 1.0.0\nfilter: ''\n")
             code, out, _ = helpers.run_main(
-                depgraph.main, ["--config", config])
+                depgraph.main, ["--config", config, "--action", "direct"])
         self.assertEqual(code, depgraph.EXIT_OK)
-        self.assertIn("libx ^1.0", out)
-        self.assertIn("tiny-json ^0.5", out)
-
-    def test_test_mode_not_yet(self):
-        """Режим тестового репозитория пока сообщает об ограничении."""
-        config = helpers.path("configs", "test_tree.yaml")
-        os.chdir(helpers.ROOT)
-        code, _, err = helpers.run_main(depgraph.main, ["--config", config])
-        self.assertEqual(code, depgraph.EXIT_ERROR)
-        self.assertIn("тестового", err)
+        self.assertIn("libx 1.2.0", out)
+        self.assertIn("tiny-json 0.5.3", out)
 
 
 if __name__ == "__main__":

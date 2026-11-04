@@ -1,0 +1,5 @@
+package: A
+repository: tests/repos/invalid/empty.txt
+test_mode: true
+version: 1.0.0
+filter: ""

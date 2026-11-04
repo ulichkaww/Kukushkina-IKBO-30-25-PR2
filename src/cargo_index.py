@@ -171,3 +171,19 @@ class CargoRepository:
     def direct_dependencies(self, name, version_text):
         """Прямые зависимости указанной версии пакета."""
         return active_dependencies(self.exact(name, version_text))
+
+    def root_node(self, package, version_text):
+        """Узел-корень (имя, версия); версия должна существовать."""
+        entry = self.exact(package, version_text)
+        return (package, str(entry.version))
+
+    def dependencies(self, node):
+        """Прямые зависимости узла с разрешёнными версиями."""
+        name, version = node
+        result = []
+        for dep in active_dependencies(self.exact(name, version)):
+            found = self.resolve(dep.package, dep.req)
+            child = (dep.package, str(found.version))
+            if child not in result:
+                result.append(child)
+        return result
