@@ -1,0 +1,6 @@
+# Обратные зависимости: пакет package — цель, репозиторий tests/repos/filter.txt
+package: D
+repository: tests/repos/filter.txt
+test_mode: true
+version: 1.0.0
+filter: "B"

@@ -4,6 +4,7 @@ import argparse
 import sys
 
 import graph as graph_module
+import reverse
 import settings as settings_module
 from cargo_index import CargoRepository
 from errors import DepGraphError
@@ -12,7 +13,7 @@ from file_repo import FileRepository
 EXIT_OK = 0
 EXIT_ERROR = 2
 DEFAULT_CONFIG = "config.yaml"
-ACTIONS = ("config", "direct", "graph")
+ACTIONS = ("config", "direct", "graph", "reverse")
 DEFAULT_ACTION = "graph"
 
 
@@ -26,8 +27,9 @@ def parse_args(argv):
         help=f"путь к YAML-конфигурации (по умолчанию {DEFAULT_CONFIG})")
     parser.add_argument(
         "--action", choices=ACTIONS, default=DEFAULT_ACTION,
-        help="config — параметры, direct — прямые зависимости, "
-             f"graph — граф с транзитивными (по умолчанию {DEFAULT_ACTION})")
+        help="config — параметры, direct — прямые зависимости, graph — граф "
+             "с транзитивными, reverse — обратные зависимости "
+             f"(по умолчанию {DEFAULT_ACTION})")
     return parser.parse_args(argv)
 
 
@@ -56,6 +58,14 @@ def show_graph(settings, repository):
     print("\n".join(graph_module.report_lines(graph, settings.filter)))
 
 
+def show_reverse(settings, repository):
+    """Вывести пакеты, которые зависят от заданного пакета."""
+    inverted = reverse.ReverseRepository(repository)
+    root = repository.root_node(settings.package, settings.version)
+    result = reverse.reverse_graph(inverted, root, settings.filter)
+    print("\n".join(reverse.report_lines(result, settings.filter)))
+
+
 def run(args):
     """Выполнить выбранное действие."""
     settings = settings_module.load_settings(args.config)
@@ -63,10 +73,9 @@ def run(args):
         print("\n".join(settings_module.describe(settings)))
         return
     repository = make_repository(settings)
-    if args.action == "direct":
-        show_direct(settings, repository)
-    else:
-        show_graph(settings, repository)
+    actions = {"direct": show_direct, "graph": show_graph,
+               "reverse": show_reverse}
+    actions[args.action](settings, repository)
 
 
 def main(argv=None):

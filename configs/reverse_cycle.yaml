@@ -1,0 +1,6 @@
+# Обратные зависимости: пакет package — цель, репозиторий tests/repos/cycle.txt
+package: C
+repository: tests/repos/cycle.txt
+test_mode: true
+version: 1.0.0
+filter: ""

@@ -76,6 +76,10 @@ class FileRepository:
             names += [name for name in dependencies if name not in names]
         return names
 
+    def all_nodes(self):
+        """Все пакеты репозитория в виде узлов."""
+        return [(name, None) for name in self.packages()]
+
     def root_node(self, package, version):
         """Узел-корень; пакет должен быть в репозитории."""
         if package not in self.packages():

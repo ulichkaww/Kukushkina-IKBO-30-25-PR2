@@ -187,3 +187,10 @@ class CargoRepository:
             if child not in result:
                 result.append(child)
         return result
+
+    def all_nodes(self):
+        """Реестр crates.io не хранит обратных ссылок."""
+        raise RepositoryError(
+            "обратные зависимости доступны только в тестовом режиме "
+            "(test_mode: true): индекс crates.io не содержит списка "
+            "пакетов, зависящих от заданного")

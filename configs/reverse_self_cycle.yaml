@@ -1,0 +1,6 @@
+# Обратные зависимости: пакет package — цель, репозиторий tests/repos/self_cycle.txt
+package: A
+repository: tests/repos/self_cycle.txt
+test_mode: true
+version: 1.0.0
+filter: ""

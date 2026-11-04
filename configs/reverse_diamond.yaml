@@ -1,0 +1,6 @@
+# Обратные зависимости: пакет package — цель, репозиторий tests/repos/diamond.txt
+package: E
+repository: tests/repos/diamond.txt
+test_mode: true
+version: 1.0.0
+filter: ""
